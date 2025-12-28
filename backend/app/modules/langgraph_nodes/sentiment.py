@@ -18,6 +18,7 @@ import os
 from groq import Groq
 from dotenv import load_dotenv
 from app.logging.logging_config import setup_logger
+from app.llm_config import LLM_MODEL
 
 logger = setup_logger(__name__)
 
@@ -49,7 +50,7 @@ def run_sentiment_sdk(state):
                     ),
                 },
             ],
-            model="gemma2-9b-it",
+            model=LLM_MODEL,
             temperature=0.2,
             max_tokens=3,
         )
