@@ -49,6 +49,7 @@ class MyState(TypedDict):
     facts: list[dict]
     sentiment: str
     perspective: str
+    short_title: str
     score: int
     retries: int
     status: str
