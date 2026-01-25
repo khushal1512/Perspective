@@ -33,6 +33,7 @@ prompt = generation_prompt
 
 
 class PerspectiveOutput(BaseModel):
+    short_title: str = Field(..., description="A catchy, concise title for this analysis (max 10 words)")
     reasoning: List[str] = Field(description="Chain-of-thought reasoning steps", alias="reasoning_steps")
     perspective: str = Field(..., description="Generated opposite perspective")
 
