@@ -10,3 +10,15 @@
     @apply bg-background-dark text-white;
   }
 }
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+    width: 0;
+    height: 0;
+  }
+}

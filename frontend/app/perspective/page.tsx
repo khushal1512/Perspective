@@ -199,7 +199,7 @@ export default function PerspectivePage() {
 
           {/* Chat Messages */}
           {messages.length > 0 && (
-            <div className="space-y-4 mt-4">
+            <div className="space-y-4 mt-4 max-h-[50vh] overflow-y-auto hide-scrollbar">
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
                 Conversation
               </h3>
