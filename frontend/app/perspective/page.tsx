@@ -20,7 +20,7 @@ import {
 
 import { usePerspective } from "@/hooks/use-perspective";
 import { useChat } from "@/hooks/use-chat";
-import { RightSidebar } from "@/components/perspective/RightSideBar";
+import { RightSidebar } from "@/components/perspective/RightSidebar";
 
 const PROVIDERS = [
   { id: "groq", name: "Groq" },
