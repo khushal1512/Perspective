@@ -1,42 +1,72 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "@/lib/config";
 
-interface AnalysisData {
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+interface Fact {
+  claim?: string;
+  status?: string;
+  reason?: string;
+}
+
+interface Citation {
+  title?: string;
+  url?: string;
+  snippet?: string;
+}
+
+export interface AnalysisData {
+  thread_id?: string;
+  article_summary?: string;
+  web_search_citations?: Citation[];
+  sentiment?: string;
   perspective?: {
     short_title?: string;
     perspective?: string;
-    reasoning?: string[];
+    reasoning_steps?: string[];
   };
-  sentiment?: string;
+  facts?: Fact[];
   score?: number;
+  status?: string;
 }
 
 interface BiasData {
   score?: number;
-  analysis?: string;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Hook                                                               */
+/* ------------------------------------------------------------------ */
 
 export function usePerspective() {
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [biasData, setBiasData] = useState<BiasData | null>(null);
   const [articleUrl, setArticleUrl] = useState("");
+  const [provider, setProvider] = useState("groq");
   const [loading, setLoading] = useState({ bias: false, process: false });
 
   useEffect(() => {
     const fetchData = async () => {
       const storedUrl = sessionStorage.getItem("articleUrl");
+      const storedProvider = sessionStorage.getItem("selectedProvider") || "groq";
       const storedAnalysis = sessionStorage.getItem("analysisResult");
       const storedBias = sessionStorage.getItem("BiasScore");
 
       if (storedUrl) setArticleUrl(storedUrl);
+      setProvider(storedProvider);
+
       if (storedAnalysis) setAnalysisData(JSON.parse(storedAnalysis));
       if (storedBias) setBiasData(JSON.parse(storedBias));
 
       if (!storedUrl || (storedBias && storedAnalysis)) return;
 
+      /* ---------- Bias score ---------- */
       if (!storedBias) {
         setLoading((prev) => ({ ...prev, bias: true }));
         try {
-          const res = await fetch("http://127.0.0.1:5555/api/bias", {
+          const res = await fetch(`${API_BASE_URL}/api/bias`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url: storedUrl }),
@@ -56,16 +86,17 @@ export function usePerspective() {
         }
       }
 
+      /* ---------- Full analysis ---------- */
       if (!storedAnalysis) {
         setLoading((prev) => ({ ...prev, process: true }));
         try {
-          const res = await fetch("http://127.0.0.1:5555/api/process", {
+          const res = await fetch(`${API_BASE_URL}/api/process`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: storedUrl }),
+            body: JSON.stringify({ url: storedUrl, provider: storedProvider }),
           });
           if (res.ok) {
-            const data = await res.json();
+            const data: AnalysisData = await res.json();
             setAnalysisData(data);
             sessionStorage.setItem("analysisResult", JSON.stringify(data));
           }
@@ -80,11 +111,14 @@ export function usePerspective() {
     fetchData();
   }, []);
 
+  /* ---------- Derived values ---------- */
   const biasScore = biasData?.score ?? analysisData?.score ?? 0;
-  
+
   const getScoreColor = () => {
-    if (biasScore <= 30) return { text: "text-green-500", gradient: ["#22c55e", "#14b8a6"], label: "Low Bias" };
-    if (biasScore <= 60) return { text: "text-yellow-500", gradient: ["#eab308", "#f59e0b"], label: "Moderate Bias" };
+    if (biasScore <= 30)
+      return { text: "text-green-500", gradient: ["#22c55e", "#14b8a6"], label: "Low Bias" };
+    if (biasScore <= 60)
+      return { text: "text-yellow-500", gradient: ["#eab308", "#f59e0b"], label: "Moderate Bias" };
     return { text: "text-red-500", gradient: ["#ef4444", "#dc2626"], label: "High Bias" };
   };
 
@@ -94,6 +128,8 @@ export function usePerspective() {
     loading,
     biasScore,
     scoreConfig: getScoreColor(),
-    articleUrl
+    articleUrl,
+    provider,
+    setProvider,
   };
 }

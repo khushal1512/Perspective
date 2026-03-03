@@ -29,12 +29,10 @@ Functions:
         Creates the StateGraph, adds processing nodes, defines
         transitions, and compiles the graph for execution.
 """
-
-
-from typing import List, Any
+from typing import List, Any, Dict
 from langgraph.graph import StateGraph
+from langgraph.checkpoint.memory import MemorySaver
 from typing_extensions import TypedDict
-
 from app.modules.langgraph_nodes import (
     sentiment,
     generate_perspective,
@@ -56,14 +54,19 @@ class MyState(TypedDict):
     claims: List[str]
     search_queries: List[Any]
     search_results: List[Any]
+    article_summary: str
+    web_search_citations: List[Dict[str, str]]
+    thread_id: str
+    provider: str  # ← NEW: routed from the frontend request
+
+
+memory = MemorySaver()
 
 
 def build_langgraph():
     graph = StateGraph(MyState)
 
-    # parallel analysis runs sentiment and fact_check tool pipeline in parallel
     graph.add_node("parallel_analysis", sentiment.run_parallel_analysis)
-
     graph.add_node("generate_perspective", generate_perspective.generate_perspective)
     graph.add_node("judge_perspective", judge.judge_perspective)
     graph.add_node("store_and_send", store_and_send.store_and_send)
@@ -92,19 +95,16 @@ def build_langgraph():
             if state.get("status") == "error"
             else (
                 "store_and_send"
-                if state.get("retries", 0) >= 3
+                if state.get("score", 0) >= 70 or state.get("retries", 0) >= 3
                 else "generate_perspective"
             )
-            if state.get("score", 0) < 70
-            else "store_and_send"
         ),
     )
 
     graph.add_conditional_edges(
         "store_and_send",
-        lambda x: ("error_handler" if x.get("status") == "error" else "__end__"),
+        lambda x: "error_handler" if x.get("status") == "error" else "end",
     )
 
     graph.set_finish_point("store_and_send")
-
-    return graph.compile()
+    return graph.compile(checkpointer=memory)

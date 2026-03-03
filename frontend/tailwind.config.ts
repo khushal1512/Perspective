@@ -89,6 +89,7 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "landing-page": "radial-gradient(106.64% 52.61% at 50% 1.95%, #2B75FF 0%, rgba(43, 117, 255, 0.85) 38.18%, rgba(4, 30, 167, 0.95) 65.11%, #0B0F16 100%)",
         "hero-gradient":
           "url('data:image/svg+xml;utf8,<svg viewBox=\"0 0 1440 2048\" xmlns=\"http://www.w3.org/2000/svg\" preserveAspectRatio=\"none\"><rect x=\"0\" y=\"0\" height=\"100%\" width=\"100%\" fill=\"url(%23grad)\" opacity=\"1\"/><defs><radialGradient id=\"grad\" gradientUnits=\"userSpaceOnUse\" cx=\"0\" cy=\"0\" r=\"10\" gradientTransform=\"matrix(-0.0000044459 107.75 -153.56 -0.0000063361 720 40)\"><stop stop-color=\"rgba(43,117,255,1)\" offset=\"0\"/><stop stop-color=\"rgba(43,117,255,0.85)\" offset=\"0.38183\"/><stop stop-color=\"rgba(24,74,211,0.9)\" offset=\"0.51648\"/><stop stop-color=\"rgba(14,52,189,0.925)\" offset=\"0.58381\"/><stop stop-color=\"rgba(4,30,167,0.95)\" offset=\"0.65113\"/><stop stop-color=\"rgba(6,26,131,0.9625)\" offset=\"0.73835\"/><stop stop-color=\"rgba(8,23,95,0.975)\" offset=\"0.82557\"/><stop stop-color=\"rgba(9,19,58,0.9875)\" offset=\"0.91278\"/><stop stop-color=\"rgba(10,17,40,0.99375)\" offset=\"0.95639\"/><stop stop-color=\"rgba(11,15,22,1)\" offset=\"1\"/></radialGradient></defs></svg>')",
         "card-gradient":
